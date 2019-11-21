@@ -28,7 +28,33 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
 ```{r}
-birthweight = 
-  read_csv("./Data/birthweight.csv") 
+library(modelr)
+library(tidyverse)
 ```
+
+load data 
+```{r}
+birthweight = 
+  read_csv('./Data/birthweight.csv') 
+```
+
+#problem 1
+clean data 
+
+```{r}
+birthweight_clean = 
+  birthweight %>% 
+  mutate(
+    babysex = fct_infreq(as.factor(babysex)),
+    frace = fct_infreq(as.factor(frace)),
+    malform = fct_infreq(as.factor(malform)),
+    mrace = fct_infreq(as.factor(mrace))
+  )
+```
+
+```{r}
+is.na(birthweight_clean)
+```
+there is no missing data in this dataset
+
 

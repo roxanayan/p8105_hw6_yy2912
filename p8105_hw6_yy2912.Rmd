@@ -52,9 +52,47 @@ birthweight_clean =
   )
 ```
 
+
 ```{r}
 is.na(birthweight_clean)
 ```
 there is no missing data in this dataset
 
+proposed model: 
+the model I proposed include several factors that may associate with baby's birthweight. 
+baby's birthweights may be associated with baby's sex, baby's head circumferences, mother's weight at delivery, mother’s age at delivery, mother’s pre-pregnancy BMI. 
 
+```{r}
+proposed_model = lm(bwt ~ babysex + bhead + delwt + momage + gaweeks + ppbmi, data = birthweight_clean)
+```
+
+
+```{r}
+proposed_model %>% 
+  broom::glance()%>%
+  knitr::kable()
+
+```
+
+the overall model has a p-value of close to 0, which is smaller than alpha of 0.05, meaning that the model proposed is a reasonable model for the outcome, birthweight
+
+```{r}
+proposed_model %>% 
+  broom::tidy()%>%
+knitr::kable()
+```
+
+in addition, all predcitors included in the model have p-values smaller than alpha of 0.05, meaning that each of them is independtly associated with the outcome birthweight and the association is statistically significant.
+
+```{r}
+birthweight_clean %>% 
+modelr::add_residuals(proposed_model) %>% 
+modelr::add_predictions(proposed_model) %>% 
+  ggplot(aes(x = pred, y = resid)) + 
+  geom_point()+
+  labs(
+    title = 'Model residuals against fitted values',
+    x = 'Fitted values',
+    y = 'Residuals'
+  )
+```

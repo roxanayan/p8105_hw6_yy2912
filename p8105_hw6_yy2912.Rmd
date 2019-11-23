@@ -33,7 +33,7 @@ library(tidyverse)
 ```
 
 load data 
-```{r}
+```{r, message=FALSE}
 birthweight = 
   read_csv('./Data/birthweight.csv') 
 ```
@@ -44,6 +44,7 @@ clean data
 ```{r}
 birthweight_clean = 
   birthweight %>% 
+  janitor::clean_names()%>%
   mutate(
     babysex = fct_infreq(as.factor(babysex)),
     frace = fct_infreq(as.factor(frace)),
@@ -54,7 +55,8 @@ birthweight_clean =
 
 
 ```{r}
-is.na(birthweight_clean)
+birthweight_clean %>% 
+filter(is.na(bwt))
 ```
 there is no missing data in this dataset
 
@@ -96,3 +98,68 @@ modelr::add_predictions(proposed_model) %>%
     y = 'Residuals'
   )
 ```
+
+compare two models
+
+```{r}
+model1 = lm(bwt ~ blength + gaweeks, data = birthweight_clean)
+```
+
+```{r}
+model2 = lm(bwt ~ bhead + blength + babysex + bhead * blength + bhead * babysex + blength * babysex, data = birthweight_clean)
+```
+
+
+```{r}
+library(mgcv)
+```
+
+
+```{r}
+cv_df= crossv_mc (birthweight_clean, 100)%>%
+
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble))
+
+cv_results=cv_df%>%
+  mutate(proposed_model= map(train,~proposed_model),
+         model1= map(train,~model1),
+         model2= map(train,~model2)
+         )%>%
+  mutate(rmse_proposed_model = map2_dbl(proposed_model, test, ~rmse(model = .x, data = .y)),
+         rmse_model1 = map2_dbl(model1, test, ~rmse(model = .x, data = .y)),
+         rmse_model2 = map2_dbl(model2, test, ~rmse(model = .x, data = .y)))
+```
+
+```{r}
+cv_results%>% 
+  select(starts_with("rmse")) %>% 
+  pivot_longer(
+    everything(),
+    names_to = "model", 
+    values_to = "rmse",
+    names_prefix = "rmse_") %>% 
+  mutate(model = fct_inorder(model)) %>% 
+  ggplot(aes(x = model, y = rmse)) + geom_violin()
+```
+
+The violin graph shows the variance in prediction error across methods and model 2 has the smallest variance and is the best of the three. 
+
+
+#problem 2
+
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_NY"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+```
+

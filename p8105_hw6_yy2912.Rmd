@@ -111,7 +111,7 @@ model2 = lm(bwt ~ bhead + blength + babysex + bhead * blength + bhead * babysex 
 ```
 
 
-```{r}
+```{r, message=FALSE}
 library(mgcv)
 ```
 
@@ -181,14 +181,14 @@ bootstrap_samples =
 ```{r}
 bootstrap_samples_new=
 bootstrap_samples %>%
-  group_by(r.squared, adj.r.squared) %>% 
- summarize(log_beta = sum(log(estimate)))
+  group_by(.id) %>% 
+ summarize(log_beta = sum(log(estimate[[1]]*estimate[[2]])))
 ```
 
 the distribution of r squared 
 
 ```{r}
-bootstrap_samples_new %>%
+bootstrap_samples %>%
   ggplot(aes(x = r.squared)) +
   geom_density() +
 labs(title = "The distribution of R Squared",
@@ -199,7 +199,7 @@ quantile(pull(bootstrap_samples, r.squared),c(0.025,0.975))
 ```
 
 Based on the plot, r squared follows a normal distribution with a slight left skewedness.
-The 95% CI of r squared lies between 0.8936 and 0.9274. 
+The 95% CI of r squared lies between 0.89 and 0.93. 
 
 the distribution of log(β^0*β^1)
 
@@ -214,5 +214,5 @@ quantile(pull(bootstrap_samples_new, log_beta),c(0.025,0.975))
 ```
 
 From the plot, log(β^0*β^1)  roughly follows a normal distribution.
-The 95% CI of log(β^0*β^1)  lies between 1.9647 and 2.0579. 
+The 95% CI of log(β^0*β^1)  lies between 1.97 and 2.06. 
 

@@ -53,6 +53,7 @@ birthweight_clean =
   )
 ```
 
+the four numeric variabled have been converted to factor variables
 
 ```{r}
 birthweight_clean %>% 
@@ -149,7 +150,7 @@ The violin graph shows the variance in prediction error across methods and model
 
 #problem 2
 
-```{r}
+```{r, message=FALSE}
 weather_df = 
   rnoaa::meteo_pull_monitors(
     c("USW00094728"),
@@ -162,4 +163,56 @@ weather_df =
     tmax = tmax / 10) %>%
   select(name, id, everything())
 ```
+
+generate bootstrap samples 
+
+```{r}
+bootstrap_samples = 
+  weather_df %>%
+  modelr::bootstrap(n = 5000) %>% 
+  mutate(
+    models = map(strap, ~lm(tmax ~ tmin, data = .x)),
+    results1 = map(models, broom::tidy), 
+    results2 = map(models, broom::glance)) %>% 
+  select(-strap, -models) %>% 
+  unnest(results1, results2) 
+```
+
+```{r}
+bootstrap_samples_new=
+bootstrap_samples %>%
+  group_by(r.squared, adj.r.squared) %>% 
+ summarize(log_beta = sum(log(estimate)))
+```
+
+the distribution of r squared 
+
+```{r}
+bootstrap_samples_new %>%
+  ggplot(aes(x = r.squared)) +
+  geom_density() +
+labs(title = "The distribution of R Squared",
+       x = "R Squared")
+
+quantile(pull(bootstrap_samples, r.squared),c(0.025,0.975))
+
+```
+
+Based on the plot, r squared follows a normal distribution with a slight left skewedness.
+The 95% CI of r squared lies between 0.8936 and 0.9274. 
+
+the distribution of log(β^0*β^1)
+
+```{r}
+bootstrap_samples_new %>%
+  ggplot(aes(x = log_beta)) +
+  geom_density() +
+  labs(title = "The distribution of log(β^0*β^1)", 
+       x = "log(β^0*β^1)")
+
+quantile(pull(bootstrap_samples_new, log_beta),c(0.025,0.975))
+```
+
+From the plot, log(β^0*β^1)  roughly follows a normal distribution.
+The 95% CI of log(β^0*β^1)  lies between 1.9647 and 2.0579. 
 

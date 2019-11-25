@@ -62,17 +62,13 @@ filter(is.na(bwt))
 there is no missing data in this dataset
 
 proposed model: 
-the model I proposed include several factors that may associate with baby's birthweight:
+the model I proposed include several factors that may associate with baby's birthweight.
 
-*baby's sex: boys may have higher birthweight than girls
-
-*baby's head circumferences: babies with larger head circumferences may have higher weight
-
-*mother's weight at delivery: mothers who have higher weigth at delivery may have babies with higher birthweight
-
-*mother's age at delivery: the younger the mother is, the baby may have higher the weight
-
-*mother's pre-pregnancy BMI: the higher the mother's pre-pregnancy BMI, there's a possibility that the baby will have higher the birthweight 
+Baby's sex: boys may have higher birthweight than girls.
+Baby's head circumferences: babies with larger head circumferences may have higher weight.
+Mother's weight at delivery: mothers who have higher weigth at delivery may have babies with higher birthweight.
+Mother's age at delivery: the younger the mother is, the baby may have higher the weight.
+Mother's pre-pregnancy BMI: the higher the mother's pre-pregnancy BMI, there's a possibility that the baby will have higher the birthweight.
 
 baby's birthweights may be associated with baby's sex, baby's head circumferences, mother's weight at delivery, mother’s age at delivery, mother’s pre-pregnancy BMI. 
 

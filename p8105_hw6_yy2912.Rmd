@@ -76,6 +76,7 @@ the model I proposed include several factors that may associate with baby's birt
 
 baby's birthweights may be associated with baby's sex, baby's head circumferences, mother's weight at delivery, mother’s age at delivery, mother’s pre-pregnancy BMI. 
 
+
 ```{r}
 proposed_model = lm(bwt ~ babysex + bhead + delwt + momage + gaweeks + ppbmi, data = birthweight_clean)
 ```
